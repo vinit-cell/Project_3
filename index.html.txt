@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Math Operation Interface</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 30px;
+        }
+        label, input, select, button {
+            margin: 10px 0;
+            display: block;
+        }
+        #output {
+            margin-top: 20px;
+            font-weight: bold;
+            color: green;
+        }
+        #graph-container {
+            width: 500px;
+            height: 300px;
+            margin-top: 20px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Math Operation Interface</h2>
+
+<label for="numA">Enter Number A (m):</label>
+<input type="number" id="numA" required>
+
+<label for="numB">Enter Number B (c):</label>
+<input type="number" id="numB" required>
+
+<label for="operation">Choose an Operation:</label>
+<select id="operation">
+    <option value="linear">y = Ax + B (Graph)</option>
+    <option value="sum">Sum (A + B)</option>
+    <option value="diff">Difference (A - B)</option>
+    <option value="max">Maximum</option>
+</select>
+
+<button onclick="performOperation()">Submit</button>
+
+<div id="output"></div>
+
+<div id="graph-container">
+    <canvas id="lineChart"></canvas>
+</div>
+
+<script>
+    let chartInstance = null;
+
+    function performOperation() {
+        const A = parseFloat(document.getElementById("numA").value);
+        const B = parseFloat(document.getElementById("numB").value);
+        const op = document.getElementById("operation").value;
+        const outputDiv = document.getElementById("output");
+        const graphContainer = document.getElementById("graph-container");
+
+        if (isNaN(A) || isNaN(B)) {
+            outputDiv.innerText = "Please enter valid numbers for A and B.";
+            return;
+        }
+
+        if (op === "linear") {
+            outputDiv.innerText = `Equation: y = ${A}x + ${B}`;
+            graphContainer.style.display = "block";
+
+            const xValues = [];
+            const yValues = [];
+            for (let x = -10; x <= 10; x++) {
+                xValues.push(x);
+                yValues.push(A * x + B);
+            }
+
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+
+            const ctx = document.getElementById("lineChart").getContext("2d");
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: xValues,
+                    datasets: [{
+                        label: 'y = Ax + B',
+                        data: yValues,
+                        borderColor: 'blue',
+                        fill: false,
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'x'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'y'
+                            }
+                        }
+                    }
+                }
+            });
+        } else {
+            graphContainer.style.display = "none";
+            let result = "";
+            switch(op) {
+                case "sum":
+                    result = `Sum: ${A + B}`;
+                    break;
+                case "diff":
+                    result = `Difference: ${A - B}`;
+                    break;
+                case "max":
+                    result = `Maximum: ${Math.max(A, B)}`;
+                    break;
+            }
+            outputDiv.innerText = result;
+        }
+    }
+</script>
+
+</body>
+</html>
+
